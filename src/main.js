@@ -1,4 +1,4 @@
-import './style.css'
+import './styles/style.css'
 
 import { dragElement,SearchToogle,resetAfterSearch } from "./scripts/helper";
 import { FindPath } from "./scripts/algo";
