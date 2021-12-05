@@ -53,17 +53,17 @@ export function dragElement(elmnt) {
 }
 
 export function Manhatan(p1,p2) {
-  return (Math.abs(p2.x-p1.x) + Math.abs(p2.y-p1.y))*document.GridStep;
+  return (Math.abs(p1.x-p2.x) + Math.abs(p1.y-p2.y))*document.GridStep;
 }
 
 export function EuclidianDistance(p1,p2) {
-  let dx  = Math.abs(p2.x-p1.x);
-  let dy  = Math.abs(p2.y-p1.y);
-  return Math.sqrt(dx*dx+dy*dy)
+  let dx  = Math.abs(p1.x-p2.x);
+  let dy  = Math.abs(p1.y-p2.y);
+  return Math.sqrt(dx*dx+dy*dy)*document.GridStep;
 }
 
 export function EuclidianDistanceSquared(p1,p2) {
-  return (Math.pow(p2.x - p1.x, 2.0) + Math.pow(p2.y - p1.y, 2.0));
+  return (Math.pow(p1.x - p2.x, 2.0) + Math.pow(p1.y - p2.y, 2.0))*document.GridStep;
 }
 
 export const SearchToogle = () =>{
