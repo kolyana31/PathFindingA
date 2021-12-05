@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.63a26457.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Path Finder</title>
+    <script type="module" crossorigin src="/assets/index.556fbd78.js"></script>
+    <link rel="modulepreload" href="/assets/vendor.d4e1d999.js">
+    <link rel="stylesheet" href="/assets/index.be0dd6bc.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="detachedMenu" class="unselectable">
+      <header >Actions</header>
+      <hr>
+      <header >Heuristic metods</header>
+      <form id="MethodsForm" style="text-align: start;">
+        <div>
+          <input type="radio" id="Manhatan"
+           name="methods" value="1" checked>
+          <label for="Manhatan">Manhatan</label>
+        </div>
+        <div>
+          <input type="radio" id="Euclidian"
+           name="methods" value="2">
+          <label for="Euclidian">Euclidian Distance</label>
+        </div>
+        <div>
+          <input type="radio" id="Euclidian2"
+           name="methods" value="3">
+          <label for="Euclidian2">Euclidian Distance^2</label>
+        </div>
+      </form>
+      <header>Options</header>
+      <form id="Options" style="text-align: start;">
+        <input type="checkbox" id="AllowDiagonale"
+        name="methods" checked>
+       <label for="AllowDiagonale">Allow Diagonale</label>
+      </form>
+      <hr>
+      <button id="SearchStarter">Start Search</button>
+      <button id="Pause" disabled=true>Pause Search</button>
+      <button id="ClearWalls" >Clear Field</button>
+      <hr>
+      <header>Results</header>
+      <div id="SearchResults">
+        <i style="color: lightgreen;">Start Search to get results</i>
+      </div>
+    </div>
+    
+  </body>
+</html>
