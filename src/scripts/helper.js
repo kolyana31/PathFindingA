@@ -63,7 +63,9 @@ export function EuclidianDistance(p1,p2) {
 }
 
 export function EuclidianDistanceSquared(p1,p2) {
-  return (Math.pow(Math.abs(p1.x-p2.x), 2.0) + Math.pow(Math.abs(p1.x-p2.x), 2.0))*document.GridStep;
+  let dx  = Math.abs(p1.x-p2.x);
+  let dy  = Math.abs(p1.y-p2.y);
+  return (dx*dx+dy*dy)*document.GridStep;
 }
 
 export const SearchToogle = () =>{
