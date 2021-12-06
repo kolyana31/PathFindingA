@@ -63,7 +63,7 @@ export function EuclidianDistance(p1,p2) {
 }
 
 export function EuclidianDistanceSquared(p1,p2) {
-  return (Math.pow(p1.x - p2.x, 2.0) + Math.pow(p1.y - p2.y, 2.0))*document.GridStep;
+  return (Math.pow(Math.abs(p1.x-p2.x), 2.0) + Math.pow(Math.abs(p1.x-p2.x), 2.0))*document.GridStep;
 }
 
 export const SearchToogle = () =>{
@@ -102,3 +102,56 @@ export const resetAfterSearch = ()=>{
       })
   });
 }
+
+export const isInside = function(x, y) {
+  return (x >= 0 && x < document.PossWAmount) && (y >= 0 && y < document.PossHAmount);
+};
+
+export const isWalkableAt = function(x, y) {
+  return isInside(x, y) && !document.GridArr[y][x].wall && !document.GridArr[y][x].startPoint;
+};
+
+export const getNeighbors = function(node) {
+  var x = node.x,
+      y = node.y,
+      neighbors = [];
+
+  // ↑
+  if (isWalkableAt(x, y - 1)) {
+      neighbors.push(document.GridArr[y - 1][x]);
+  }
+  // →
+  if (isWalkableAt(x + 1, y)) {
+      neighbors.push(document.GridArr[y][x + 1]);
+  }
+  // ↓
+  if (isWalkableAt(x, y + 1)) {
+      neighbors.push(document.GridArr[y + 1][x]);
+  }
+  // ←
+  if (isWalkableAt(x - 1, y)) {
+      neighbors.push(document.GridArr[y][x - 1]);
+  }
+
+  if (!document.AllowDiagonale) {
+      return neighbors;
+  }
+  // ↖
+  if (isWalkableAt(x - 1, y - 1) && (isWalkableAt(x - 1, y) || isWalkableAt(x, y - 1))) {
+      neighbors.push(document.GridArr[y - 1][x - 1]);
+  }
+  // ↗
+  if (isWalkableAt(x + 1, y - 1) && (isWalkableAt(x + 1, y) || isWalkableAt(x, y - 1))) {
+      neighbors.push(document.GridArr[y - 1][x + 1]);
+  }
+  // ↘
+  if (isWalkableAt(x + 1, y + 1) && (isWalkableAt(x + 1, y) || isWalkableAt(x, y + 1))) {
+      neighbors.push(document.GridArr[y + 1][x + 1]);
+  }
+  // ↙
+  if (isWalkableAt(x - 1, y + 1) && (isWalkableAt(x - 1, y) || isWalkableAt(x, y + 1))) {
+      neighbors.push(document.GridArr[y + 1][x - 1]);
+  }
+
+  return neighbors;
+};

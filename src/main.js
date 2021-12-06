@@ -6,7 +6,7 @@ import { FindPath } from "./scripts/algo";
 dragElement(document.getElementById("detachedMenu"));
 
 document.mouseDown = false;
-document.GridStep = 10;
+document.GridStep = 1;
 document.Method = document.querySelector('input[name="methods"]:checked').value;
 document.SearchMode = false;
 document.SearchTry =false;

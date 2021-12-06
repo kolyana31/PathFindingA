@@ -15,9 +15,9 @@ export class Spot {
         this.parent=null
 
         if(startPoint){
-            this.weight = 0;
-            this.aprocDist;
-            this.move = 0;
+            this.weight = 0;//f
+            this.aprocDist;//h
+            this.move = 0;//g
             this.parent = NaN
         }
 

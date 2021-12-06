@@ -1,12 +1,18 @@
 import Raphael from "raphael";
 import { Spot } from "./class";
-import { Manhatan,EuclidianDistance,EuclidianDistanceSquared, SearchToogle } from "../scripts/helper";
+import {
+	Manhatan,
+	EuclidianDistance,
+	EuclidianDistanceSquared,
+	SearchToogle,
+	getNeighbors,
+} from "../scripts/helper";
 
-const HevristicMethod ={
-    1:Manhatan,
-    2:EuclidianDistance,
-    3:EuclidianDistanceSquared
-}
+const HevristicMethod = {
+	1: Manhatan,
+	2: EuclidianDistance,
+	3: EuclidianDistanceSquared,
+};
 
 let paper = Raphael(
 	0,
@@ -15,37 +21,29 @@ let paper = Raphael(
 	document.documentElement.clientHeight - 1
 );
 let WH = 30;
-let PossWAmount = document.documentElement.clientWidth / WH;
-let PossHAmount = document.documentElement.clientHeight / WH;
+document.PossWAmount = document.documentElement.clientWidth / WH;
+document.PossHAmount = document.documentElement.clientHeight / WH;
 
 document.resultPath = paper.path();
 document.GridArr = [];
 
-for (let y = 0; y < PossHAmount; y++) {
+for (let y = 0; y < document.PossHAmount; y++) {
 	let tmp = [];
-	for (let x = 0; x < PossWAmount; x++) {
+	for (let x = 0; x < document.PossWAmount; x++) {
 		let el;
 		if (
-			y == Math.floor(PossHAmount / 2) &&
-			x == Math.floor(PossWAmount / 2.5) &&
+			y == Math.floor(document.PossHAmount / 2) &&
+			x == Math.floor(document.PossWAmount / 2.5) &&
 			!document.StartPoint
 		) {
-			el = new Spot(
-				x,
-				y,
-				paper.rect(x * WH, y * WH, WH, WH),
-				true,
-				false,
-                WH
-			);
+			el = new Spot(x, y, paper.rect(x * WH, y * WH, WH, WH), true, false, WH);
 			document.startPoint = { x, y };
-			console.log(document.startPoint);
 		} else if (
-			y == Math.floor(PossHAmount / 2) &&
-			x == Math.floor(PossWAmount / 1.5) &&
+			y == Math.floor(document.PossHAmount / 2) &&
+			x == Math.floor(document.PossWAmount / 1.5) &&
 			!document.EndPoint
 		) {
-			el = new Spot(x, y, paper.rect(x * WH, y * WH, WH, WH), false,false,WH);
+			el = new Spot(x, y, paper.rect(x * WH, y * WH, WH, WH), false, false, WH);
 			document.endPoint = { x, y };
 		} else {
 			el = new Spot(
@@ -54,7 +52,7 @@ for (let y = 0; y < PossHAmount; y++) {
 				paper.rect(x * WH, y * WH, WH, WH),
 				null,
 				Math.random() < 0.0,
-                WH
+				WH
 			);
 		}
 		tmp.push(el);
@@ -69,132 +67,118 @@ export const FindPath = () => {
 	let closedList = [];
 	let found = false;
 
-    let interationsC = 0;
+	let interationsC = 0;
 
-    document.SearchResults={};
-    document.getElementById("SearchResults").innerHTML = `<i style="color: orange;">Processing...</i>`;
+	document.SearchResults = {};
+	document.getElementById(
+		"SearchResults"
+	).innerHTML = `<i style="color: orange;">Processing...</i>`;
 
-    let interval = setInterval(()=>{
-        if (document.SearchCanceled) {
-            clearInterval(interval);
-            SearchToogle();
-            document.SearchCanceled=false;
-            return;
-        }
-        if(document.SearchPause){
-            return;
-        }
-        if (openList.length==0 || found) {
-            if (!found) {
-                document.SearchResults = null;
-                document.getElementById("SearchResults").innerHTML = `<i style="color: tomato;">Can\`t find path</i>`;
-            }
-            else{
-                document.getElementById("SearchResults").innerHTML =
-                    `<i style="color: lightgreen;">
+	let interval = setInterval(() => {
+		if (document.SearchCanceled) {
+			clearInterval(interval);
+			SearchToogle();
+			document.SearchCanceled = false;
+			return;
+		}
+		if (document.SearchPause) {
+			return;
+		}
+		if (openList.length == 0 || found) {
+			if (!found) {
+				document.SearchResults = null;
+				document.getElementById(
+					"SearchResults"
+				).innerHTML = `<i style="color: tomato;">Can\`t find path</i>`;
+			} else {
+				document.getElementById(
+					"SearchResults"
+				).innerHTML = `<i style="color: lightgreen;">
                         Step weight Hor/Ver: ${document.GridStep} <br>
-                        Step weight Diag: ${document.GridStep*1.4} <br>
+                        Step weight Diag: ${(document.GridStep * Math.SQRT2).toFixed(2)} <br>
                         Iterations: ${interationsC} <br>
                         Steps: ${document.SearchResults.steps} <br>
-                        Path Weight: ${document.SearchResults.pathLength} <br>
+                        Path Weight: ${document.SearchResults.pathLength.toFixed(2)} <br>
                     </i>`;
-            }
-            clearInterval(interval);
-            SearchToogle();
-            return;
-        }
+			}
+			clearInterval(interval);
+			SearchToogle();
+			return;
+		}
 
-        interationsC++;
+		//-------------- start *WHILE* ---------------------
 
-        let q = openList.reduce(function (prev, curr) {
+		let q = openList.reduce(function (prev, curr) {
 			return prev.weight < curr.weight ? prev : curr;
 		});
 
+		if (
+			q.x == document.endPoint.x &&
+			q.y == document.endPoint.y
+		){
+			let tmp = document.GridArr[q.y][q.x];
+			document.SearchResults.steps = 0;
+			document.SearchResults.pathLength = tmp.move;
+			let str = `M${tmp.center.x} ${tmp.center.y}`;
+			while (tmp?.parent) {
+				document.SearchResults.steps++;
+				str += `L${tmp.center.x} ${tmp.center.y}M${tmp.center.x} ${tmp.center.y}`;
+				tmp = tmp.parent;
+			}
+			str += `L${tmp.center.x} ${tmp.center.y}`;
+			document.resultPath = paper.path(str);
+			found = true;
+			return;
+		}
+
+		interationsC++;
 		openList = openList.filter((el) => !(el.x == q.x && el.y == q.y));
 		closedList.push(q);
 
-		for (let i = q.x - 1; i <= q.x + 1; i++) {
-			if (found) {
-				break;
+		let neighbors = getNeighbors(q);
+		for (let i = 0; i < neighbors.length; i++) {
+
+			let CPLSS = closedList.find(
+				el => (el.x == neighbors[i].x && el.y == neighbors[i].y)
+			);
+			if (CPLSS) {
+				continue;
 			}
-			for (let j = q.y - 1; j <= q.y + 1; j++) {
-				if (
-					i >= 0 &&
-					i < document.GridArr[0].length &&
-					j >= 0 &&
-					j < document.GridArr.length
-				) {
-                    if (document.AllowDiagonale==false && (
-                        (i==q.x+1 && j==q.y+1) ||
-                        (i==q.x-1 && j==q.y+1) ||
-                        (i==q.x-1 && j==q.y-1) ||
-                        (i==q.x+1 && j==q.y-1)
-                    )) {
-                        continue;
-                    }
-					if (
-						!(i == q.x && j == q.y) &&
-						!document.GridArr[j][i].wall &&
-						document.GridArr[j][i].parent == null &&
-						!(
-                            (document.GridArr?.[q.y]?.[q.x+1]?.wall &&
-								document.GridArr?.[q.y+1]?.[q.x]?.wall && (i==q.x+1 && j==q.y+1)) ||
 
-                            (document.GridArr?.[q.y]?.[q.x-1]?.wall &&
-                                document.GridArr?.[q.y+1]?.[q.x]?.wall && (i==q.x-1 && j==q.y+1)) ||
+			let is_better = false;
+			let ng = q.move +
+			(document.GridArr[neighbors[i].y][neighbors[i].x].x - q.x === 0 ||
+			document.GridArr[neighbors[i].y][neighbors[i].x].y - q.y === 0
+				? document.GridStep
+				: Math.SQRT2);
 
-                            (document.GridArr?.[q.y]?.[q.x-1]?.wall &&
-                                document.GridArr?.[q.y-1]?.[q.x]?.wall && (i==q.x-1 && j==q.y-1)) ||
-
-                            (document.GridArr?.[q.y-1]?.[q.x]?.wall &&
-                                document.GridArr?.[q.y]?.[q.x+1]?.wall && (i==q.x+1 && j==q.y-1))
-						)
-					) {
-						document.GridArr[j][i].parent = q;
-						document.GridArr[j][i].move = q.move;
-						if (
-							((document.GridArr[j][i].x < q.x ||
-								document.GridArr[j][i].x > q.x) &&
-								document.GridArr[j][i].y == q.y) ||
-							((document.GridArr[j][i].y < q.y ||
-								document.GridArr[j][i].y > q.y) &&
-								document.GridArr[j][i].x == q.x)
-						) {
-							document.GridArr[j][i].move += document.GridStep;
-						} else {
-							document.GridArr[j][i].move += document.GridStep * 1.4;
-						}
-						document.GridArr[j][i].aprocDist = HevristicMethod[document.Method](
-							{ x: document.GridArr[j][i].x, y: document.GridArr[j][i].y },
-							document.endPoint
-						);
-						document.GridArr[j][i].weight =
-							document.GridArr[j][i].aprocDist + document.GridArr[j][i].move;
-						if (
-							document.GridArr[j][i].x == document.endPoint.x &&
-							document.GridArr[j][i].y == document.endPoint.y
-						) {
-							found = true;
-                            let tmp = document.GridArr[j][i];
-                            document.SearchResults.steps= 0;
-                            document.SearchResults.pathLength = tmp.move;
-                            let str=`M${tmp.center.x} ${tmp.center.y}`;
-                            while(tmp?.parent){
-                                document.SearchResults.steps++;
-                                str+=`L${tmp.center.x} ${tmp.center.y}M${tmp.center.x} ${tmp.center.y}`
-                                tmp = tmp.parent;
-                            }
-                            str+=`L${tmp.center.x} ${tmp.center.y}`
-                            document.resultPath = paper.path(str);
-							break;
-						}
-						openList.push(document.GridArr[j][i]);
-					}
+			let OPLSS = openList.findIndex(
+				el => (el.x == neighbors[i].x && el.y == neighbors[i].y)
+			);
+			if (OPLSS === -1) {
+				is_better=true;
+				openList.push(document.GridArr[neighbors[i].y][neighbors[i].x]);
+			}else{
+				if (ng < document.GridArr[neighbors[i].y][neighbors[i].x].move) {
+					is_better=true;
 				}
 			}
+			if (is_better) {
+				document.GridArr[neighbors[i].y][neighbors[i].x].parent = q;
+				document.GridArr[neighbors[i].y][neighbors[i].x].move = ng;
+				document.GridArr[neighbors[i].y][neighbors[i].x].aprocDist =
+					HevristicMethod[document.Method](
+						document.GridArr[neighbors[i].y][neighbors[i].x],
+						document.endPoint
+					);
+				document.GridArr[neighbors[i].y][neighbors[i].x].weight =
+					document.GridArr[neighbors[i].y][neighbors[i].x].move +
+					document.GridArr[neighbors[i].y][neighbors[i].x].aprocDist;
+			}
+
 		}
 		openList.forEach((el, i) => {
 			document.GridArr[el.y][el.x].show(true);
 		});
-    },30)
+	}, 30);
 };
