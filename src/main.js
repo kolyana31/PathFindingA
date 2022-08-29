@@ -5,6 +5,7 @@ import { FindPath } from "./scripts/algo";
 
 dragElement(document.getElementById("detachedMenu"));
 
+// Global states of app
 document.mouseDown = false;
 document.GridStep = 1;
 document.Method = document.querySelector('input[name="methods"]:checked').value;
